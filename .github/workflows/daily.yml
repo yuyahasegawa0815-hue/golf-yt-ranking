@@ -1,0 +1,61 @@
+name: daily-update
+
+on:
+  schedule:
+    - cron: "47 20 * * *"   # 毎日 JST 5:47 にデータ取得とサイト更新
+  workflow_dispatch:
+    inputs:
+      discover:
+        description: "新しいチャンネルを検索して追加する"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: daily-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      YT_API_KEY: ${{ secrets.YT_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Discover new channels (毎週月曜 or 手動)
+        run: |
+          if [ "${{ github.event.inputs.discover }}" = "true" ] || [ "$(TZ=Asia/Tokyo date +%u)" = "1" ]; then
+            python scripts/discover.py 2
+          fi
+
+      - name: Snapshot
+        run: python scripts/snapshot.py
+
+      - name: Build site
+        run: python scripts/build.py
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data
+          git diff --cached --quiet || git commit -m "data: $(TZ=Asia/Tokyo date +%F)"
+          git push
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deploy
+        uses: actions/deploy-pages@v4
