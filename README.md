@@ -14,6 +14,7 @@
 
 ## 設定 (`config.json`)
 - `site_name` / `base_url`：独自ドメインに移行したら `base_url` を変更
+- `gsc_verification`：Search Console の「HTMLタグ」確認コード（content="..." の中身）
 - `ga4_id`：GA4の測定ID（例 `G-XXXXXXX`）を入れると計測タグが入る
 - `min_subscribers`：掲載する最低登録者数
 - `discover_queries`：チャンネル発見に使う検索語

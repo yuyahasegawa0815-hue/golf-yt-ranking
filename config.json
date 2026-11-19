@@ -3,12 +3,29 @@
   "site_description": "国内ゴルフYouTubeチャンネルの登録者数・再生数・急上昇を毎日自動集計するランキングサイト",
   "base_url": "https://yuyahasegawa0815-hue.github.io/golf-yt-ranking",
   "ga4_id": "",
+  "gsc_verification": "",
   "min_subscribers": 3000,
   "keep_days": 30,
   "discover_queries": [
-    "ゴルフ", "ゴルフレッスン", "ゴルフ女子", "ゴルフ 試打", "ゴルフ ラウンド",
-    "ゴルフ スイング", "ゴルフ 初心者", "ゴルフ ドライバー", "プロゴルファー", "ゴルフ 100切り"
+    "ゴルフ",
+    "ゴルフレッスン",
+    "ゴルフ女子",
+    "ゴルフ 試打",
+    "ゴルフ ラウンド",
+    "ゴルフ スイング",
+    "ゴルフ 初心者",
+    "ゴルフ ドライバー",
+    "プロゴルファー",
+    "ゴルフ 100切り"
   ],
-  "relevance_keywords": ["ゴルフ", "golf", "ゴルファー", "スイング", "ラウンド", "PGA", "JLPGA"],
+  "relevance_keywords": [
+    "ゴルフ",
+    "golf",
+    "ゴルファー",
+    "スイング",
+    "ラウンド",
+    "PGA",
+    "JLPGA"
+  ],
   "exclude_channel_ids": []
 }

@@ -83,6 +83,8 @@ def page(path, title, desc, body, depth, jsonld=None):
         ga = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={g}"></script>'
               f"<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments)}}"
               f"gtag('js',new Date());gtag('config','{g}');</script>")
+    if CFG.get("gsc_verification"):
+        ga += f'<meta name="google-site-verification" content="{e(CFG["gsc_verification"])}">'
     url = f"{BASE}/{path}".replace("index.html", "")
     ld = f'<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ""
     full_title = title if title == NAME else f"{title}｜{NAME}"
