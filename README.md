@@ -8,7 +8,7 @@
 | `scripts/discover.py` | 検索APIでゴルフ系チャンネルを発見し `data/channels.json` に追加 | 毎週月曜（手動実行も可） |
 | `scripts/snapshot.py` | 全チャンネルの統計・直近30日の動画を取得 | 毎日 |
 | `scripts/build.py` | `data/` から `dist/` に静的サイトを生成 | 毎日 |
-| `.github/workflows/daily.yml` | 上記を実行し GitHub Pages に公開 | 毎日 JST 5:47 |
+| `.github/workflows/daily.yml` | 上記を実行し Cloudflare Pages に公開（未設定時は GitHub Pages） | 毎日 JST 5:47 |
 
 依存ライブラリなし（Python 3.10+ 標準ライブラリのみ）。
 

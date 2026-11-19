@@ -27,6 +27,8 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     env:
       YT_API_KEY: ${{ secrets.YT_API_KEY }}
+      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_PROJECT: golf-yt-ranking
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -53,9 +55,30 @@ jobs:
           git diff --cached --quiet || git commit -m "data: $(TZ=Asia/Tokyo date +%F)"
           git push
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      # --- 公開先: Cloudflare Pages（CLOUDFLARE_API_TOKEN が登録済みの場合） ---
+      - name: Create Cloudflare Pages project (初回のみ・既存なら無視)
+        if: env.CF_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create ${{ env.CF_PROJECT }} --production-branch=main
+      - name: Deploy to Cloudflare Pages
+        if: env.CF_TOKEN != ''
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=${{ env.CF_PROJECT }} --branch=main --commit-dirty=true
+
+      # --- 公開先: GitHub Pages（Cloudflare 未設定時のみ） ---
+      - if: env.CF_TOKEN == ''
+        uses: actions/configure-pages@v5
+      - if: env.CF_TOKEN == ''
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
       - id: deploy
+        if: env.CF_TOKEN == ''
         uses: actions/deploy-pages@v4
