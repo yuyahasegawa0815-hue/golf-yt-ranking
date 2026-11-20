@@ -1,0 +1,107 @@
+<!--{"title": "ポーカー勝率計算機（エクイティ計算・無料）", "description": "テキサスホールデムの勝率（エクイティ）を無料で計算。手札とボードのカードを選ぶだけで、最大6人の勝率・引き分け率がわかります。"}-->
+<div class="crumb"><a href="{{root}}">ホーム</a> › 練習ツール › 勝率計算機</div>
+<h1>ポーカー勝率計算機</h1>
+<p class="lead">枠をタップしてから下のカードを選ぶと入力できます。手札を空欄にしたプレイヤーは「ランダムな手札」として計算します。</p>
+
+<div class="panel">
+  <div class="row" style="justify-content:space-between">
+    <label>人数 <select id="np"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+    <div class="row"><button id="clear">リセット</button><button id="calc" class="primary">勝率を計算</button></div>
+  </div>
+  <div id="players" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:14px 0"></div>
+  <div><b style="font-size:.9rem">ボード（フロップ・ターン・リバー）</b>
+    <div id="board" class="row" style="margin:6px 0 14px"></div></div>
+  <div id="deck" class="deck"></div>
+  <p id="status" style="font-size:.85rem;color:var(--muted);margin:10px 0 0"></p>
+</div>
+
+<h2>使い方と勝率の見方</h2>
+<div class="article">
+<p><b>エクイティ（勝率）</b>とは、このあと残りのカードがすべて配られたときに、そのプレイヤーが最終的にポットを獲得する割合のことです。引き分けの場合は人数で割った分を加えています。</p>
+<ul>
+<li>全員の手札が決まっていて、残りのボードが2枚以下のときは、すべての組み合わせを数えた<b>正確な値</b>を表示します。</li>
+<li>それ以外は、数万回のシミュレーションによる<b>近似値</b>です（誤差はおおむね±0.5%以内）。</li>
+</ul>
+<p>代表的な対決の勝率：AA対KKはおよそ82%対18%、AKスーテッド対QQはおよそ46%対54%、ペア対オーバーカード2枚は約55%対45%（いわゆる「コイントス」）です。</p>
+<p>コールすべきかどうかの判断には、勝率と<a href="{{root}}learn/odds/">ポットオッズ</a>の比較が役立ちます。</p>
+</div>
+
+<script src="{{root}}assets/poker.js"></script>
+<script>
+(function(){
+  var P = Poker, slots = {}, active = null;
+  function $(id){ return document.getElementById(id); }
+  function slotIds(){
+    var n = +$("np").value, ids = [];
+    for (var p=0;p<n;p++) ids.push("p"+p+"a","p"+p+"b");
+    return ids.concat(["b0","b1","b2","b3","b4"]);
+  }
+  function used(){ var u = {}; slotIds().forEach(function(k){ if (slots[k] != null) u[slots[k]] = k; }); return u; }
+  function slotHtml(k){ return '<span data-slot="'+k+'" style="cursor:pointer">'+P.cardHtml(slots[k], active===k?"active":"")+'</span>'; }
+  function render(res){
+    var n = +$("np").value, h = "";
+    for (var p=0;p<n;p++){
+      var r = res && res.players[p];
+      h += '<div style="border:1px solid var(--line);border-radius:10px;padding:10px">' +
+        '<div style="font-size:.85rem;font-weight:700;margin-bottom:6px">プレイヤー'+(p+1)+'</div>' +
+        '<div class="row" style="gap:6px">'+slotHtml("p"+p+"a")+slotHtml("p"+p+"b")+'</div>' +
+        (r ? '<div style="margin-top:8px"><div class="result">'+(r.equity*100).toFixed(1)+'%</div>' +
+          '<div class="bar"><i style="width:'+(r.equity*100)+'%"></i></div>' +
+          '<div style="font-size:.78rem;color:var(--muted);margin-top:4px">勝ち '+(r.win*100).toFixed(1)+'% ・ 引分 '+(r.tie*100).toFixed(1)+'%</div></div>' : "") +
+        '</div>';
+    }
+    $("players").innerHTML = h;
+    $("board").innerHTML = ["b0","b1","b2","b3","b4"].map(slotHtml).join("");
+    var u = used(), d = "";
+    "shdc".split("").forEach(function(s){
+      "AKQJT98765432".split("").forEach(function(r){
+        var id = P.cardId(r+s), red = s==="h"||s==="d";
+        d += '<button data-card="'+id+'" class="'+(red?"red ":"")+(u[id]!=null?"used":"")+'">'+(r==="T"?"10":r)+({s:"♠",h:"♥",d:"♦",c:"♣"})[s]+'</button>';
+      });
+    });
+    $("deck").innerHTML = d;
+  }
+  function nextEmpty(after){
+    var ids = slotIds(), i = ids.indexOf(after);
+    for (var k=i+1;k<ids.length;k++) if (slots[ids[k]] == null) return ids[k];
+    return null;
+  }
+  document.addEventListener("click", function(e){
+    var s = e.target.closest("[data-slot]"), c = e.target.closest("[data-card]");
+    if (s){
+      var k = s.dataset.slot;
+      if (slots[k] != null){ slots[k] = null; active = k; } else active = (active===k ? null : k);
+      render();
+    } else if (c){
+      var id = +c.dataset.card, u = used();
+      if (u[id] != null){ slots[u[id]] = null; active = u[id]; render(); return; }
+      if (!active) active = nextEmpty(null) || slotIds()[0];
+      slots[active] = id;
+      active = nextEmpty(active);
+      render();
+    }
+  });
+  $("np").onchange = function(){ render(); };
+  $("clear").onclick = function(){ slots = {}; active = "p0a"; $("status").textContent = ""; render(); };
+  $("calc").onclick = function(){
+    var n = +$("np").value, hands = [], err = "";
+    for (var p=0;p<n;p++){
+      var a = slots["p"+p+"a"], b = slots["p"+p+"b"];
+      if ((a==null) !== (b==null)) err = "プレイヤー"+(p+1)+"の手札は2枚とも入力するか、2枚とも空欄にしてください。";
+      hands.push(a!=null && b!=null ? [a,b] : null);
+    }
+    var board = ["b0","b1","b2","b3","b4"].map(function(k){ return slots[k]; }).filter(function(x){ return x!=null; });
+    if (board.length && board.length < 3) err = "ボードは0枚・3枚・4枚・5枚のいずれかで入力してください。";
+    if (!hands.some(function(h){ return h; })) err = "少なくとも1人の手札を入力してください。";
+    if (err){ $("status").textContent = err; return; }
+    $("status").textContent = "計算中…";
+    setTimeout(function(){
+      var t = performance.now(), res = P.equity(hands, board, 40000);
+      render(res);
+      $("status").textContent = (res.exact ? "全" + res.total.toLocaleString() + "通りを数えた正確な値です。" :
+        res.total.toLocaleString() + "回のシミュレーションによる近似値です。") + "（" + Math.round(performance.now()-t) + "ms）";
+    }, 20);
+  };
+  active = "p0a"; render();
+})();
+</script>

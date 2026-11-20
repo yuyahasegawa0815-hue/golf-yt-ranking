@@ -27,5 +27,28 @@
     "PGA",
     "JLPGA"
   ],
-  "exclude_channel_ids": []
+  "exclude_channel_ids": [],
+  "core_pattern": "ゴルフ|golf|ゴルファー",
+  "cf_project": "golf-yt-ranking",
+  "logo_html": "⛳ ゴルフ<span>YouTube</span>ランキング",
+  "nav": [
+    [
+      "急上昇",
+      "ranking/growth/"
+    ],
+    [
+      "登録者数",
+      "ranking/subscribers/"
+    ],
+    [
+      "人気動画",
+      "videos/"
+    ],
+    [
+      "このサイトについて",
+      "about/"
+    ]
+  ],
+  "home": "golf",
+  "genre_label": "ゴルフ"
 }

@@ -1,0 +1,119 @@
+<!--{"title": "プリフロップ練習クイズ（無料ポーカートレーニング）", "description": "ポジションと手札を見て、レイズかフォールドかを答えるポーカーのプリフロップ練習クイズ。6人テーブルのオープンレンジを解説つきで何問でも練習できます。"}-->
+<div class="crumb"><a href="{{root}}">ホーム</a> › 練習ツール › プリフロップ練習クイズ</div>
+<h1>プリフロップ練習クイズ</h1>
+<p class="lead">6人テーブル・持ち点100BB。あなたの前の人は全員フォールドしました。この手札で<b>レイズ（オープン）</b>しますか？</p>
+
+<div class="panel">
+  <div class="row" style="justify-content:space-between">
+    <label>ポジション
+      <select id="posSel">
+        <option value="">ランダム</option><option>UTG</option><option>HJ</option><option>CO</option><option>BTN</option><option>SB</option>
+      </select>
+    </label>
+    <div id="score" style="font-size:.9rem;color:var(--muted)"></div>
+  </div>
+  <div style="text-align:center;margin:18px 0 6px">
+    <div id="pos" style="font-weight:800;font-size:1.05rem"></div>
+    <div id="hand" style="margin:10px 0;display:flex;gap:8px;justify-content:center"></div>
+    <div id="cls" style="color:var(--muted);font-size:.9rem"></div>
+  </div>
+  <div class="row" style="justify-content:center;margin:12px 0">
+    <button id="fold" style="min-width:120px">フォールド</button>
+    <button id="raise" class="primary" style="min-width:120px">レイズ</button>
+  </div>
+  <div id="fb" style="text-align:center;min-height:2em"></div>
+  <div id="detail" style="display:none">
+    <p id="explain" style="font-size:.92rem"></p>
+    <div id="grid"></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>オープンするハンド</span><span><i style="background:#f2b705"></i>今回の手札</span></div>
+    <div class="row" style="justify-content:center"><button id="next" class="primary">次の問題（Enter）</button></div>
+  </div>
+</div>
+
+<div class="panel" id="byPos"></div>
+
+<h2>このクイズの考え方</h2>
+<div class="article">
+<p>テキサスホールデムでは、<b>どのポジションから参加するか</b>で参加すべき手札の幅（レンジ）が大きく変わります。後ろに残っている人数が多いUTGほど強い手札に絞り、最後に行動できるBTNほど広く参加します。</p>
+<p>このクイズの正解は、6人テーブル・100BB・全員フォールドで回ってきた場面の<a href="{{root}}tools/ranges/">オープンレンジ表</a>（当サイトの簡易版）に基づきます。プロの戦略やソルバーの出力と細部は異なりますが、「どのくらいの手札で参加するか」の感覚をつかむ目安として使ってください。</p>
+<p>出題は、判断を迷いやすい<b>レンジの境目の手札</b>が多めに出るようにしています。</p>
+</div>
+
+<script src="{{root}}assets/poker.js"></script>
+<script>
+(function(){
+  var P = Poker, POS = ["UTG","HJ","CO","BTN","SB"], KEY = "ptl-quiz-v1";
+  var st = P.store(KEY) || {n:0, ok:0, streak:0, best:0, pos:{}};
+  var cur = null, answered = false;
+  var all = P.allClasses();
+
+  // レンジの境目（上下左右に結果が違うマスがある）ハンドを出題しやすくする
+  var edge = {};
+  POS.forEach(function(p){
+    var s = P.RFI[p].set, list = [];
+    for (var i=0;i<13;i++) for (var j=0;j<13;j++){
+      var c = P.gridClass(i,j), inR = !!s[c];
+      [[1,0],[-1,0],[0,1],[0,-1]].some(function(d){
+        var a=i+d[0], b=j+d[1];
+        if (a<0||b<0||a>12||b>12) return false;
+        if (!!s[P.gridClass(a,b)] !== inR){ list.push(c); return true; }
+        return false;
+      });
+    }
+    edge[p] = list;
+  });
+
+  function $(id){ return document.getElementById(id); }
+  function renderScore(){
+    var pct = st.n ? Math.round(st.ok/st.n*100) : 0;
+    $("score").textContent = "正解 " + st.ok + " / " + st.n + "（" + pct + "%）・連続正解 " + st.streak + "・最高 " + st.best;
+    var h = '<b>ポジション別の正解率</b><div style="display:grid;gap:6px;margin-top:8px">';
+    POS.forEach(function(p){
+      var r = st.pos[p] || {n:0,ok:0}, v = r.n ? r.ok/r.n*100 : 0;
+      h += '<div style="display:grid;grid-template-columns:3.5em 1fr 6em;gap:8px;align-items:center;font-size:.85rem"><span>'+p+'</span><div class="bar"><i style="width:'+v+'%"></i></div><span>'+(r.n?Math.round(v)+'%（'+r.ok+'/'+r.n+'）':'-')+'</span></div>';
+    });
+    $("byPos").innerHTML = h + '</div><p style="margin:10px 0 0"><button id="reset" style="font-size:.8rem;padding:4px 10px">成績をリセット</button></p>';
+    $("reset").onclick = function(){ if (confirm("成績をリセットしますか？")) { st = {n:0,ok:0,streak:0,best:0,pos:{}}; P.store(KEY, st); renderScore(); } };
+  }
+  function next(){
+    var pos = $("posSel").value || POS[Math.floor(Math.random()*POS.length)];
+    var pool = Math.random() < 0.6 ? edge[pos] : all;
+    var cls = pool[Math.floor(Math.random()*pool.length)];
+    cur = {pos: pos, cls: cls, cards: P.dealClass(cls)};
+    answered = false;
+    $("pos").textContent = "あなたのポジション：" + P.RFI[pos].name;
+    $("hand").innerHTML = P.cardHtml(cur.cards[0], "big") + P.cardHtml(cur.cards[1], "big");
+    $("cls").textContent = "";
+    $("fb").innerHTML = "";
+    $("detail").style.display = "none";
+    $("fold").disabled = $("raise").disabled = false;
+  }
+  function answer(raise){
+    if (answered || !cur) return;
+    answered = true;
+    var should = !!P.RFI[cur.pos].set[cur.cls], ok = raise === should;
+    st.n++; if (ok){ st.ok++; st.streak++; st.best = Math.max(st.best, st.streak); } else st.streak = 0;
+    var r = st.pos[cur.pos] || (st.pos[cur.pos] = {n:0, ok:0}); r.n++; if (ok) r.ok++;
+    P.store(KEY, st);
+    $("cls").textContent = "ハンド：" + cur.cls + "（" + (cur.cls.length===2?"ポケットペア":cur.cls[2]==="s"?"スーテッド":"オフスート") + "）";
+    $("fb").innerHTML = '<span class="result '+(ok?"ok":"ng")+'">'+(ok?"⭕ 正解！":"❌ 不正解")+'</span> 正解は <b>'+(should?"レイズ":"フォールド")+'</b>';
+    $("explain").innerHTML = "<b>" + cur.cls + "</b> は " + cur.pos + " のオープンレンジに" + (should ? "含まれます。" : "含まれません。") +
+      " " + cur.pos + " からは全体の約" + P.rangePct(P.RFI[cur.pos].set).toFixed(0) + "%の手札でオープンします。" + P.RFI[cur.pos].note;
+    $("grid").innerHTML = P.rangeGridHtml(P.RFI[cur.pos].set, cur.cls);
+    $("detail").style.display = "";
+    $("fold").disabled = $("raise").disabled = true;
+    renderScore();
+  }
+  $("fold").onclick = function(){ answer(false); };
+  $("raise").onclick = function(){ answer(true); };
+  $("next").onclick = next;
+  $("posSel").onchange = next;
+  document.addEventListener("keydown", function(e){
+    if (e.target.tagName === "SELECT") return;
+    if (e.key === "Enter" && answered) next();
+    else if ((e.key === "f" || e.key === "ArrowLeft") && !answered) answer(false);
+    else if ((e.key === "r" || e.key === "ArrowRight") && !answered) answer(true);
+  });
+  renderScore(); next();
+})();
+</script>

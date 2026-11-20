@@ -1,0 +1,41 @@
+<!--{"title": "ポーカーのアウツ・オッズ早見表とポットオッズ計算", "description": "テキサスホールデムのアウツ別の勝率（ターン・リバー）を一覧表で。フラッシュドロー・ストレートドローの完成確率、2と4のルール、ポットオッズから必要勝率を出す計算ツール付き。"}-->
+<div class="crumb"><a href="{{root}}">ホーム</a> › 学ぶ › アウツ・オッズ早見表</div>
+<h1>アウツ・オッズ早見表</h1>
+<p class="lead">ドローが完成する確率と、コールに必要な勝率（ポットオッズ）を確認できます。</p>
+
+<h2>ポットオッズ計算</h2>
+<div class="panel">
+  <div class="row">
+    <label>現在のポット（相手のベットを含まない） <input id="pot" type="number" min="0" value="100" style="width:7em" class="filter"></label>
+    <label>相手のベット額 <input id="bet" type="number" min="0" value="50" style="width:7em" class="filter"></label>
+  </div>
+  <div id="po" class="result"></div>
+  <p id="po2" style="font-size:.9rem;color:var(--muted)"></p>
+</div>
+
+<h2>アウツ別の完成確率</h2>
+<p>「アウツ」とは、引けば自分の手が勝ちになると考えられる残りのカードの枚数です。フロップ時点では見えていないカードは47枚、ターン時点では46枚です。</p>
+<div class="scroll"><table class="plain"><thead><tr><th>アウツ</th><th>ターンで完成</th><th>リバーで完成<br>（ターン時点）</th><th>ターンかリバー<br>（フロップ時点）</th><th>2と4のルール<br>（概算）</th></tr></thead><tbody><tr><td>1</td><td>2.1%</td><td>2.2%</td><td>4.3%</td><td>2% / 4%</td></tr><tr><td>2</td><td>4.3%</td><td>4.3%</td><td>8.4%</td><td>4% / 8%</td></tr><tr><td>3</td><td>6.4%</td><td>6.5%</td><td>12.5%</td><td>6% / 12%</td></tr><tr><td>4</td><td>8.5%</td><td>8.7%</td><td>16.5%</td><td>8% / 16%</td></tr><tr><td>5</td><td>10.6%</td><td>10.9%</td><td>20.4%</td><td>10% / 20%</td></tr><tr><td>6</td><td>12.8%</td><td>13.0%</td><td>24.1%</td><td>12% / 24%</td></tr><tr><td>7</td><td>14.9%</td><td>15.2%</td><td>27.8%</td><td>14% / 28%</td></tr><tr><td>8</td><td>17.0%</td><td>17.4%</td><td>31.5%</td><td>16% / 32%</td></tr><tr><td>9</td><td>19.1%</td><td>19.6%</td><td>35.0%</td><td>18% / 36%</td></tr><tr><td>10</td><td>21.3%</td><td>21.7%</td><td>38.4%</td><td>20% / 40%</td></tr><tr><td>11</td><td>23.4%</td><td>23.9%</td><td>41.7%</td><td>22% / 44%</td></tr><tr><td>12</td><td>25.5%</td><td>26.1%</td><td>45.0%</td><td>24% / 48%</td></tr><tr><td>13</td><td>27.7%</td><td>28.3%</td><td>48.1%</td><td>26% / 52%</td></tr><tr><td>14</td><td>29.8%</td><td>30.4%</td><td>51.2%</td><td>28% / 56%</td></tr><tr><td>15</td><td>31.9%</td><td>32.6%</td><td>54.1%</td><td>30% / 60%</td></tr><tr><td>16</td><td>34.0%</td><td>34.8%</td><td>57.0%</td><td>32% / 64%</td></tr><tr><td>17</td><td>36.2%</td><td>37.0%</td><td>59.8%</td><td>34% / 68%</td></tr><tr><td>18</td><td>38.3%</td><td>39.1%</td><td>62.4%</td><td>36% / 72%</td></tr><tr><td>19</td><td>40.4%</td><td>41.3%</td><td>65.0%</td><td>38% / 76%</td></tr><tr><td>20</td><td>42.6%</td><td>43.5%</td><td>67.5%</td><td>40% / 80%</td></tr></tbody></table></div>
+
+<h2>よくあるドローのアウツ</h2>
+<div class="scroll"><table class="plain"><thead><tr><th>ドローの種類</th><th>アウツ</th><th>フロップ→リバーまで</th><th>ターン→リバー</th></tr></thead><tbody><tr><td style='text-align:left'>フラッシュドロー＋オープンエンド</td><td>15</td><td>54.1%</td><td>32.6%</td></tr><tr><td style='text-align:left'>フラッシュドロー＋ガットショット</td><td>12</td><td>45.0%</td><td>26.1%</td></tr><tr><td style='text-align:left'>フラッシュドロー</td><td>9</td><td>35.0%</td><td>19.6%</td></tr><tr><td style='text-align:left'>オープンエンド・ストレートドロー</td><td>8</td><td>31.5%</td><td>17.4%</td></tr><tr><td style='text-align:left'>2オーバーカード</td><td>6</td><td>24.1%</td><td>13.0%</td></tr><tr><td style='text-align:left'>ポケットペア→セット</td><td>2</td><td>8.4%</td><td>4.3%</td></tr><tr><td style='text-align:left'>ガットショット・ストレートドロー</td><td>4</td><td>16.5%</td><td>8.7%</td></tr><tr><td style='text-align:left'>ツーペア→フルハウス</td><td>4</td><td>16.5%</td><td>8.7%</td></tr></tbody></table></div>
+
+<h2>2と4のルール</h2>
+<div class="article">
+<p>暗算で確率をざっくり出す方法です。<b>アウツ×2</b>が「次の1枚で完成する確率（%）」、フロップでオールインになったときなど2枚見られる場合は<b>アウツ×4</b>が「リバーまでに完成する確率（%）」のおおよその値になります。アウツが多いと4倍のルールは実際より高めに出るので注意しましょう。</p>
+<h2>ポットオッズとコールの判断</h2>
+<p>相手のベットにコールするとき、必要な勝率は <b>コール額 ÷（ポット＋相手のベット＋自分のコール額）</b> です。たとえばポット100に相手が50ベットした場合、50 ÷（100＋50＋50）＝ 25% の勝率があればコールが損になりません。自分の勝率がこれを上回るかどうかを、上の表や<a href="{{root}}tools/equity/">勝率計算機</a>で確認してみましょう。</p>
+</div>
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function calc(){
+    var pot = +$("pot").value || 0, bet = +$("bet").value || 0;
+    if (bet <= 0){ $("po").textContent = "ベット額を入力してください"; $("po2").textContent = ""; return; }
+    var need = bet / (pot + bet * 2) * 100;
+    $("po").textContent = "必要な勝率：" + need.toFixed(1) + "%";
+    $("po2").textContent = "ポットオッズ " + ((pot + bet) / bet).toFixed(2) + " : 1。必要なアウツの目安：ターン→リバーで約" + Math.ceil(need / 100 * 46) + "枚、フロップ→リバー（オールイン）で約" + Math.ceil(need / 4) + "枚。";
+  }
+  $("pot").oninput = $("bet").oninput = calc; calc();
+})();
+</script>

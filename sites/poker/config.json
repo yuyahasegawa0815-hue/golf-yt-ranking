@@ -1,0 +1,93 @@
+{
+  "site_name": "ポーカートレーニングラボ",
+  "site_description": "無料で使えるポーカー練習ツール（プリフロップクイズ・勝率計算機・レンジ表）と、ポーカーYouTube動画のジャンル別ランキング",
+  "base_url": "https://poker-training-lab.pages.dev",
+  "cf_project": "poker-training-lab",
+  "ga4_id": "",
+  "gsc_verification": "",
+  "min_subscribers": 1000,
+  "keep_days": 30,
+  "core_pattern": "ポーカー|poker|ホールデム",
+  "video_pattern": "ポーカー|poker|ホールデム|WSOP|WPT|EPT|APT|JOPT|GTO|オールイン|プリフロップ|フロップ|ハンド",
+  "discover_queries": [
+    "ポーカー",
+    "テキサスホールデム",
+    "ポーカー 解説",
+    "ポーカー 大会",
+    "ポーカー 実況",
+    "WSOP 日本人",
+    "ポーカー GTO",
+    "ポーカー 初心者",
+    "ポーカー プロ",
+    "アミューズメントポーカー"
+  ],
+  "relevance_keywords": [
+    "ポーカー",
+    "poker",
+    "ホールデム",
+    "WSOP",
+    "GTO",
+    "トーナメント",
+    "ハンド",
+    "オールイン"
+  ],
+  "exclude_channel_ids": [],
+  "genres": [
+    {
+      "slug": "strategy",
+      "name": "解説・戦略",
+      "pattern": "解説|講座|戦略|GTO|レンジ|初心者|勝ち方|基礎|理論|レッスン|ハンドレビュー|考察|学ぶ|コツ|入門|やり方|ルール|上達|反省会|振り返|なぜ|正解|トレーニング",
+      "desc": "戦略・理論・ハンドレビューなど、ポーカーが上手くなるための解説動画"
+    },
+    {
+      "slug": "tournament",
+      "name": "トーナメント",
+      "pattern": "WSOP|WPT|EPT|APT|JOPT|トーナメント|大会|決勝|ファイナルテーブル|FT|優勝|入賞|ブレスレット|メインイベント|予選",
+      "desc": "WSOPなど国内外のポーカー大会の挑戦記・中継・結果報告"
+    },
+    {
+      "slug": "cash",
+      "name": "キャッシュゲーム",
+      "pattern": "キャッシュ|ハイステ|ハイローラー|リングゲーム|cash game|\\d+/\\d+",
+      "desc": "キャッシュゲーム（リングゲーム）の実戦動画"
+    },
+    {
+      "slug": "entertainment",
+      "name": "エンタメ",
+      "pattern": "",
+      "desc": "企画・対決・バラエティなど、見て楽しいポーカー動画"
+    }
+  ],
+  "theme": {
+    "accent": "#b42335",
+    "accent_weak": "#fbeaec",
+    "accent_dark": "#ff7b88",
+    "accent_weak_dark": "#3a1d21"
+  },
+  "logo_html": "♠ ポーカー<span>トレーニング</span>ラボ",
+  "nav": [
+    [
+      "練習クイズ",
+      "tools/preflop-quiz/"
+    ],
+    [
+      "勝率計算",
+      "tools/equity/"
+    ],
+    [
+      "レンジ表",
+      "tools/ranges/"
+    ],
+    [
+      "動画ランキング",
+      "videos/"
+    ],
+    [
+      "用語集",
+      "learn/glossary/"
+    ]
+  ],
+  "home": "poker",
+  "about_extra_html": "<h2>ご注意</h2><p>当サイトはポーカーの戦略を学ぶための情報サイトであり、金銭を賭けるギャンブルを推奨するものではありません。日本国内から金銭を賭けてオンラインポーカーやオンラインカジノを利用することは、賭博罪に問われるおそれがあります。</p>",
+  "genre_label": "ポーカー"
+}

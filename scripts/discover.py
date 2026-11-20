@@ -1,4 +1,6 @@
-"""検索APIでゴルフ系チャンネルを発見し data/channels.json に追加する（週1回想定）。
+"""検索APIでジャンルに合うチャンネルを発見し sites/<site>/data/channels.json に追加する（週1回想定）。
+
+使い方: python scripts/discover.py <site> [ページ数]
 
 クォータ: 1検索 = 100ユニット。クエリ数 x ページ数 x 100 を消費する。
 """
@@ -6,26 +8,27 @@ import re
 import sys
 
 import yt
-from common import DATA, config, load_json, save_json, today_jst
+from common import load_json, save_json, site_from_argv, today_jst
 
 JP = re.compile(r"[぀-ヿ一-鿿]")
 
 
-def is_golf(snippet, keywords):
+def is_relevant(snippet, cfg):
     title = snippet.get("title", "")
     desc = snippet.get("description", "")
     text = (title + "\n" + desc).lower()
     if not JP.search(title + desc):
         return False
-    if re.search(r"ゴルフ|golf|ゴルファー", title, re.I):
+    core = re.compile(cfg["core_pattern"], re.I)
+    if core.search(title):
         return True
-    hits = sum(text.count(k.lower()) for k in keywords)
-    return text.count("ゴルフ") + text.count("golf") >= 2 and hits >= 3
+    hits = sum(text.count(k.lower()) for k in cfg["relevance_keywords"])
+    return len(core.findall(text)) >= 2 and hits >= 3
 
 
-def main(pages=2):
-    cfg = config()
-    path = DATA / "channels.json"
+def main(site, pages=2):
+    cfg = site.cfg
+    path = site.data / "channels.json"
     db = load_json(path, {"channels": {}, "rejected": []})
     known = set(db["channels"]) | set(db["rejected"]) | set(cfg["exclude_channel_ids"])
 
@@ -49,7 +52,7 @@ def main(pages=2):
         sn, st = c["snippet"], c["statistics"]
         subs = int(st.get("subscriberCount", 0))
         if st.get("hiddenSubscriberCount") or subs < cfg["min_subscribers"] \
-                or not is_golf(sn, cfg["relevance_keywords"]):
+                or not is_relevant(sn, cfg):
             db["rejected"].append(c["id"])
             continue
         db["channels"][c["id"]] = {
@@ -69,4 +72,4 @@ def main(pages=2):
 
 
 if __name__ == "__main__":
-    main(int(sys.argv[1]) if len(sys.argv) > 1 else 2)
+    main(site_from_argv(), int(sys.argv[2]) if len(sys.argv) > 2 else 2)

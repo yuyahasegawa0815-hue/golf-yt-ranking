@@ -1,0 +1,50 @@
+<!--{"title": "プリフロップレンジ表（6人テーブル・ポジション別オープンレンジ）", "description": "テキサスホールデム6人テーブルのポジション別オープンレンジを13×13の表で解説。UTG・HJ・CO・BTN・SBでどの手札から参加すべきかがひと目でわかります。"}-->
+<div class="crumb"><a href="{{root}}">ホーム</a> › 練習ツール › プリフロップレンジ表</div>
+<h1>プリフロップレンジ表（6人テーブル）</h1>
+<p class="lead">100BB・自分より前の全員がフォールドしたときに、レイズで参加（オープン）する手札の目安です。</p>
+
+<div class="tabs" id="tabs"></div>
+<div class="panel">
+  <div class="row" style="justify-content:space-between;align-items:baseline">
+    <h2 id="title" style="margin:0;border:0;padding:0"></h2>
+    <div id="pct" class="result"></div>
+  </div>
+  <p id="note" style="font-size:.92rem"></p>
+  <div id="grid"></div>
+  <div class="legend"><span><i style="background:var(--accent)"></i>オープン（レイズ）</span><span><i style="background:var(--line)"></i>フォールド</span></div>
+  <p style="font-size:.82rem;color:var(--muted)">レンジ表記：<code id="txt"></code></p>
+  <a class="btn" href="{{root}}tools/preflop-quiz/">このレンジでクイズに挑戦 →</a>
+</div>
+
+<h2>レンジ表の見方</h2>
+<div class="article">
+<ul>
+<li><b>対角線</b>（AA, KK, … 22）はポケットペアです。</li>
+<li><b>右上</b>は2枚が同じスートの「スーテッド」（例：AKs）、<b>左下</b>はスートが違う「オフスート」（例：AKo）です。</li>
+<li>同じ数字の組み合わせでも、スーテッドはフラッシュの可能性がある分だけ価値が高く、レンジに多く含まれます。</li>
+</ul>
+<h2>なぜポジションでレンジが変わるのか</h2>
+<p>自分より後ろに残っている人数が多いほど、強い手札を持っている人がいる確率が上がります。また、フロップ以降に後から行動できる（ポジションがある）と、相手の行動を見てから判断できるため有利です。そのためUTGでは全体の約14%に絞り、BTNでは約40%まで広げます。</p>
+<p>※この表は初心者〜中級者向けに当サイトが作成した簡易版の目安です。相手の傾向やスタックの深さ、ゲームの種類（トーナメント・キャッシュゲーム）によって最適なレンジは変わります。</p>
+</div>
+
+<script src="{{root}}assets/poker.js"></script>
+<script>
+(function(){
+  var P = Poker, POS = ["UTG","HJ","CO","BTN","SB"];
+  function $(id){ return document.getElementById(id); }
+  function show(p){
+    var r = P.RFI[p];
+    $("title").textContent = r.name;
+    $("pct").textContent = "約" + P.rangePct(r.set).toFixed(1) + "%";
+    $("note").textContent = r.note;
+    $("grid").innerHTML = P.rangeGridHtml(r.set);
+    $("txt").textContent = r.range;
+    Array.prototype.forEach.call($("tabs").children, function(a){ a.style.borderColor = a.dataset.p===p ? "var(--accent)" : ""; a.style.color = a.dataset.p===p ? "var(--accent)" : ""; });
+    try { history.replaceState(null, "", "#" + p); } catch(e) {}
+  }
+  $("tabs").innerHTML = POS.map(function(p){ return '<a href="#'+p+'" data-p="'+p+'">'+p+'</a>'; }).join("");
+  $("tabs").onclick = function(e){ var a = e.target.closest("[data-p]"); if (a){ e.preventDefault(); show(a.dataset.p); } };
+  show(POS.indexOf(location.hash.slice(1)) >= 0 ? location.hash.slice(1) : "UTG");
+})();
+</script>

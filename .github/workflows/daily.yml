@@ -19,16 +19,18 @@ concurrency:
   group: daily-update
   cancel-in-progress: false
 
+env:
+  SITES: "golf poker"
+
 jobs:
   update:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     env:
       YT_API_KEY: ${{ secrets.YT_API_KEY }}
-      CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CF_PROJECT: golf-yt-ranking
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,47 +40,40 @@ jobs:
       - name: Discover new channels (毎週月曜 or 手動)
         run: |
           if [ "${{ github.event.inputs.discover }}" = "true" ] || [ "$(TZ=Asia/Tokyo date +%u)" = "1" ]; then
-            python scripts/discover.py 2
+            for s in $SITES; do python scripts/discover.py $s 2; done
           fi
 
-      - name: Snapshot
-        run: python scripts/snapshot.py
-
-      - name: Build site
-        run: python scripts/build.py
+      - name: Snapshot & build
+        run: |
+          for s in $SITES; do
+            python scripts/snapshot.py $s
+            python scripts/build.py $s
+          done
 
       - name: Commit data
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A data
+          git add -A sites/*/data
           git diff --cached --quiet || git commit -m "data: $(TZ=Asia/Tokyo date +%F)"
           git push
 
       # --- 公開先: Cloudflare Pages（CLOUDFLARE_API_TOKEN が登録済みの場合） ---
-      - name: Create Cloudflare Pages project (初回のみ・既存なら無視)
-        if: env.CF_TOKEN != ''
-        uses: cloudflare/wrangler-action@v3
-        continue-on-error: true
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages project create ${{ env.CF_PROJECT }} --production-branch=main
       - name: Deploy to Cloudflare Pages
-        if: env.CF_TOKEN != ''
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ env.CF_PROJECT }} --branch=main --commit-dirty=true
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          for s in $SITES; do
+            proj=$(python -c "import json;print(json.load(open('sites/$s/config.json'))['cf_project'])")
+            npx --yes wrangler@4 pages project create "$proj" --production-branch=main >/dev/null 2>&1 || true
+            npx --yes wrangler@4 pages deploy "dist/$s" --project-name="$proj" --branch=main --commit-dirty=true
+          done
 
-      # --- 公開先: GitHub Pages（Cloudflare 未設定時のみ） ---
-      - if: env.CF_TOKEN == ''
+      # --- 公開先: GitHub Pages（Cloudflare 未設定時のみ・ゴルフ版） ---
+      - if: env.CLOUDFLARE_API_TOKEN == ''
         uses: actions/configure-pages@v5
-      - if: env.CF_TOKEN == ''
+      - if: env.CLOUDFLARE_API_TOKEN == ''
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
-      - id: deploy
-        if: env.CF_TOKEN == ''
+          path: dist/golf
+      - if: env.CLOUDFLARE_API_TOKEN == ''
         uses: actions/deploy-pages@v4
